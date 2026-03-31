@@ -157,4 +157,40 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // 6. Mouse Glow Effect with Lerp
+    const cursorGlow = document.getElementById('cursor-glow');
+    if (cursorGlow) {
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+        let glowX = mouseX;
+        let glowY = mouseY;
+        let isMouseMoving = false;
+
+        window.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            if (!isMouseMoving) {
+                isMouseMoving = true;
+                cursorGlow.style.opacity = '1';
+            }
+        });
+
+        document.addEventListener('mouseleave', () => {
+            isMouseMoving = false;
+            cursorGlow.style.opacity = '0';
+        });
+
+        function animateGlow() {
+            glowX += (mouseX - glowX) * 0.15;
+            glowY += (mouseY - glowY) * 0.15;
+            
+            // Center the 600x600 glow
+            cursorGlow.style.transform = `translate3d(${glowX - 300}px, ${glowY - 300}px, 0)`;
+
+            requestAnimationFrame(animateGlow);
+        }
+        
+        animateGlow();
+    }
+
 });

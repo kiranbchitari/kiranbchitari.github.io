@@ -65,6 +65,23 @@ body::before {
     mask-image: linear-gradient(to bottom, black 0%, transparent 80%);
 }
 
+/* Mouse Glow Effect */
+.cursor-glow {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(56, 189, 248, 0.1) 0%, rgba(139, 92, 246, 0.1) 30%, transparent 60%);
+    pointer-events: none;
+    z-index: 99; /* Below navbar (100) but above content to give it a neat tint */
+    filter: blur(50px);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    will-change: transform, opacity;
+}
+
 /* ===== Typography ===== */
 h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading);
