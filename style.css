@@ -202,6 +202,93 @@ a {
     width: 100%;
 }
 
+/* Dropdown styles */
+.dropdown {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 200px;
+    margin-top: 15px;
+    padding: 15px 0;
+    list-style: none;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: var(--transition-smooth);
+    z-index: 1000;
+    background: rgba(18, 18, 18, 0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border-glass);
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+/* Arrow indicator for dropdown menu */
+.dropdown-menu::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: 30px;
+    width: 10px;
+    height: 10px;
+    background: #121212;
+    border-left: 1px solid var(--border-glass);
+    border-top: 1px solid var(--border-glass);
+    transform: rotate(45deg);
+}
+
+.dropdown-menu li {
+    width: 100%;
+}
+
+.dropdown-menu .nav-link {
+    display: block;
+    padding: 10px 25px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+}
+
+.dropdown-menu .nav-link::after {
+    display: none; /* Hide the sliding indicator in dropdown items */
+}
+
+.dropdown-menu .nav-link:hover {
+    color: var(--text-accent);
+    background: rgba(255,255,255,0.03);
+}
+
+/* Show dropdown on hover (Desktop) */
+@media (min-width: 769px) {
+    .dropdown:hover > .dropdown-menu {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+}
+
+.dropdown-icon {
+    margin-left: 8px;
+    width: 10px;
+    height: 10px;
+    transition: transform 0.3s ease;
+    opacity: 0.6;
+}
+
+.dropdown:hover .dropdown-icon {
+    opacity: 1;
+}
+
+.dropdown.active .dropdown-icon {
+    transform: rotate(180deg);
+}
+
 /* Mobile Menu Button */
 .mobile-menu-btn {
     display: none;
@@ -786,6 +873,54 @@ footer p {
 
     .nav-links.active {
         clip-path: circle(150% at top right);
+    }
+
+    /* Mobile Dropdown adjustment */
+    .dropdown {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .dropdown-menu {
+        position: static;
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        padding: 0;
+        max-height: 0;
+        overflow: hidden;
+        transition: all 0.3s ease-in-out;
+        margin-top: 0;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        border-radius: 0;
+    }
+
+    .dropdown.active .dropdown-menu {
+        max-height: 500px;
+        margin-top: 15px;
+        padding-bottom: 10px;
+    }
+
+    .dropdown-menu::before {
+        display: none;
+    }
+
+    .dropdown-menu li .nav-link {
+        font-size: 0.9rem;
+        padding: 5px 0;
+        color: var(--text-secondary);
+    }
+    
+    .dropdown-icon {
+        margin-left: 10px;
+        width: 12px;
+        height: 12px;
     }
     
     .mobile-menu-btn.active span:nth-child(1) {

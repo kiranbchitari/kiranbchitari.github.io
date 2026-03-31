@@ -39,8 +39,10 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(type, typingSpeed);
     }
 
-    // Start typing animation after a small delay
-    setTimeout(type, 1000);
+    // Start typing animation after a small delay if element exists
+    if (typingText) {
+        setTimeout(type, 1000);
+    }
 
 
     // 2. Scroll Progress Bar & Navbar Styling
@@ -51,16 +53,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.addEventListener('scroll', () => {
         // Scroll Progress
-        const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-        const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-        const scrolled = (winScroll / height) * 100;
-        scrollProgress.style.width = scrolled + '%';
+        if (scrollProgress) {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            scrollProgress.style.width = scrolled + '%';
+        }
 
         // Navbar Background
-        if (window.scrollY > 50) {
-            navbar.classList.add('scrolled');
-        } else {
-            navbar.classList.remove('scrolled');
+        if (navbar) {
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
         }
 
         // Active Nav Link Highlighting
@@ -108,9 +114,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const mobileMenuBtn = document.getElementById('mobile-menu-btn');
     const navLinksContainer = document.querySelector('.nav-links');
 
-    mobileMenuBtn.addEventListener('click', () => {
-        mobileMenuBtn.classList.toggle('active');
-        navLinksContainer.classList.toggle('active');
+    if (mobileMenuBtn && navLinksContainer) {
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenuBtn.classList.toggle('active');
+            navLinksContainer.classList.toggle('active');
+        });
+    }
+
+    // Dropdown handling on mobile
+    const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
+    dropdownToggles.forEach(toggle => {
+        toggle.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768) {
+                e.preventDefault();
+                const dropdown = toggle.parentElement;
+                dropdown.classList.toggle('active');
+            }
+        });
     });
 
     // Close mobile menu when a link is clicked
