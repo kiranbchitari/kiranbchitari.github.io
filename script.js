@@ -1,6 +1,29 @@
 // ===== DOM Loading =====
 document.addEventListener('DOMContentLoaded', () => {
 
+    // 0. Theme Toggle
+    const themeToggle = document.getElementById('theme-toggle');
+    const lightModeClass = 'light-mode';
+
+    function setThemeToggleState(isLightMode) {
+        if (!themeToggle) {
+            return;
+        }
+
+        themeToggle.setAttribute('aria-pressed', String(isLightMode));
+        themeToggle.setAttribute('aria-label', isLightMode ? 'Switch to dark mode' : 'Switch to light mode');
+    }
+
+    setThemeToggleState(document.body.classList.contains(lightModeClass));
+
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            const isLightMode = document.body.classList.toggle(lightModeClass);
+            localStorage.setItem('theme', isLightMode ? 'light' : 'dark');
+            setThemeToggleState(isLightMode);
+        });
+    }
+
     // 1. Typing Animation
     const typingText = document.getElementById('typing-text');
     const roles = [
