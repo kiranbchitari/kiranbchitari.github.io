@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const roles = [
         'Technical Lead',
         '.NET Backend Developer',
-        'AI & LLM Enthusiast',
+        'AI Application Developer',
         'System Design Engineer'
     ];
 

@@ -180,7 +180,7 @@ h1, h2, h3, h4 {
 .nav-links {
     display: flex;
     align-items: center;
-    gap: 30px;
+    gap: 26px;
     margin-left: auto;
 }
 
@@ -658,6 +658,82 @@ body.light-mode .sun-icon {
         radial-gradient(50% 70% at 0% 100%, rgba(41, 151, 255, 0.18), transparent 70%);
 }
 
+/* ===== AI Engineering ===== */
+.ai-grid,
+.labs-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.ai-card {
+    padding: 32px;
+}
+
+.ai-card h3 {
+    margin-top: 16px;
+    font-size: 24px;
+    letter-spacing: -0.022em;
+}
+
+.ai-card p {
+    margin-top: 10px;
+    color: var(--text-secondary);
+}
+
+.ai-card .skill-list {
+    margin-top: 20px;
+}
+
+.level {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: var(--chip-bg);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.level::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.level-hands-on { color: var(--green); }
+.level-working { color: var(--accent); }
+
+/* ===== Labs ===== */
+.lab-card {
+    padding: 28px;
+}
+
+.lab-tag {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+}
+
+.lab-card h3 {
+    margin-top: 10px;
+    font-size: 21px;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+}
+
+.lab-card p {
+    margin-top: 8px;
+    font-size: 15px;
+    color: var(--text-secondary);
+}
+
 /* ===== Experience ===== */
 .timeline {
     border-top: 1px solid var(--hairline);
@@ -761,9 +837,12 @@ body.light-mode .sun-icon {
 /* ===== Projects ===== */
 .projects-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(6, 1fr);
     gap: 20px;
 }
+
+.project-card.span-3 { grid-column: span 3; }
+.project-card.span-2 { grid-column: span 2; }
 
 .project-card {
     padding: 40px;
@@ -998,12 +1077,21 @@ footer {
         grid-column: 1 / -1;
     }
 
-    .goals-list {
+    .goals-list,
+    .ai-grid,
+    .labs-grid {
         grid-template-columns: repeat(2, 1fr);
     }
 
     .goals-list li {
         min-height: 170px;
+    }
+
+    .project-card.span-2 { grid-column: span 3; }
+    .project-card.span-2:last-child { grid-column: 1 / -1; }
+
+    .nav-links {
+        gap: 18px;
     }
 
     .about-content {
@@ -1114,8 +1202,20 @@ footer {
 
     .skills-grid,
     .projects-grid,
-    .goals-list {
+    .goals-list,
+    .ai-grid,
+    .labs-grid {
         gap: 14px;
+    }
+
+    .ai-grid,
+    .labs-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .project-card.span-3,
+    .project-card.span-2 {
+        grid-column: 1 / -1;
     }
 
     .skill-category,
@@ -1133,6 +1233,10 @@ footer {
 
     .projects-grid {
         grid-template-columns: 1fr;
+    }
+
+    .nav-links {
+        gap: 4px;
     }
 
     .project-card,
