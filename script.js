@@ -1,15 +1,12 @@
-// ===== DOM Loading =====
 document.addEventListener('DOMContentLoaded', () => {
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    // 0. Theme Toggle
+    // 1. Theme toggle
     const themeToggle = document.getElementById('theme-toggle');
     const lightModeClass = 'light-mode';
 
     function setThemeToggleState(isLightMode) {
-        if (!themeToggle) {
-            return;
-        }
-
+        if (!themeToggle) return;
         themeToggle.setAttribute('aria-pressed', String(isLightMode));
         themeToggle.setAttribute('aria-label', isLightMode ? 'Switch to dark mode' : 'Switch to light mode');
     }
@@ -19,221 +16,151 @@ document.addEventListener('DOMContentLoaded', () => {
     if (themeToggle) {
         themeToggle.addEventListener('click', () => {
             const isLightMode = document.body.classList.toggle(lightModeClass);
-            localStorage.setItem('theme', isLightMode ? 'light' : 'dark');
+            try {
+                localStorage.setItem('theme', isLightMode ? 'light' : 'dark');
+            } catch (e) { /* storage unavailable */ }
             setThemeToggleState(isLightMode);
         });
     }
 
-    // 1. Typing Animation
+    // 2. Typing animation
     const typingText = document.getElementById('typing-text');
     const roles = [
-        "Technical Lead",
-        ".NET Backend Developer",
-        "AI & LLM Enthusiast",
-        "System Design Engineer"
+        'Technical Lead',
+        '.NET Backend Developer',
+        'AI & LLM Enthusiast',
+        'System Design Engineer'
     ];
-    let roleIndex = 0;
-    let charIndex = 0;
-    let isDeleting = false;
-    let typingSpeed = 100;
 
-    function type() {
-        const currentRole = roles[roleIndex];
-
-        if (isDeleting) {
-            typingText.textContent = currentRole.substring(0, charIndex - 1);
-            charIndex--;
-            typingSpeed = 50;
-        } else {
-            typingText.textContent = currentRole.substring(0, charIndex + 1);
-            charIndex++;
-            typingSpeed = 100;
-        }
-
-        if (!isDeleting && charIndex === currentRole.length) {
-            isDeleting = true;
-            typingSpeed = 2000; // Pause at end of word
-        } else if (isDeleting && charIndex === 0) {
-            isDeleting = false;
-            roleIndex = (roleIndex + 1) % roles.length;
-            typingSpeed = 500; // Pause before next word starts
-        }
-
-        setTimeout(type, typingSpeed);
-    }
-
-    // Start typing animation after a small delay if element exists
     if (typingText) {
-        setTimeout(type, 1000);
+        if (reduceMotion) {
+            typingText.textContent = roles[0];
+        } else {
+            let roleIndex = 0;
+            let charIndex = 0;
+            let isDeleting = false;
+
+            const type = () => {
+                const currentRole = roles[roleIndex];
+                let delay;
+
+                if (isDeleting) {
+                    charIndex--;
+                    delay = 40;
+                } else {
+                    charIndex++;
+                    delay = 85;
+                }
+                typingText.textContent = currentRole.substring(0, charIndex);
+
+                if (!isDeleting && charIndex === currentRole.length) {
+                    isDeleting = true;
+                    delay = 2000;
+                } else if (isDeleting && charIndex === 0) {
+                    isDeleting = false;
+                    roleIndex = (roleIndex + 1) % roles.length;
+                    delay = 450;
+                }
+
+                setTimeout(type, delay);
+            };
+
+            setTimeout(type, 700);
+        }
     }
 
-
-    // 2. Scroll Progress Bar & Navbar Styling
-    const scrollProgress = document.getElementById('scroll-progress');
+    // 3. Navbar state and active link
     const navbar = document.getElementById('navbar');
-    const sections = document.querySelectorAll('section');
+    const sections = document.querySelectorAll('section[id]');
     const navLinks = document.querySelectorAll('.nav-link');
+    let ticking = false;
 
-    window.addEventListener('scroll', () => {
-        // Scroll Progress
-        if (scrollProgress) {
-            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-            const scrolled = (winScroll / height) * 100;
-            scrollProgress.style.width = scrolled + '%';
-        }
+    function updateOnScroll() {
+        ticking = false;
 
-        // Navbar Background
         if (navbar) {
-            if (window.scrollY > 50) {
-                navbar.classList.add('scrolled');
-            } else {
-                navbar.classList.remove('scrolled');
-            }
+            navbar.classList.toggle('scrolled', window.scrollY > 8);
         }
 
-        // Active Nav Link Highlighting
         let current = '';
         sections.forEach(section => {
-            const sectionTop = section.offsetTop;
-            const sectionHeight = section.clientHeight;
-            if (scrollY >= (sectionTop - sectionHeight / 3)) {
-                current = section.getAttribute('id');
+            if (window.scrollY >= section.offsetTop - window.innerHeight / 3) {
+                current = section.id;
             }
         });
 
         navLinks.forEach(link => {
-            link.classList.remove('active');
-            if (link.getAttribute('href') === `#${current}`) {
-                link.classList.add('active');
-            }
+            link.classList.toggle('active', Boolean(current) && link.getAttribute('href') === `#${current}`);
         });
-    });
+    }
 
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            ticking = true;
+            requestAnimationFrame(updateOnScroll);
+        }
+    }, { passive: true });
+    updateOnScroll();
 
-    // 3. Section Reveal Animation
+    // 4. Scroll reveal, staggered for items that enter together
     const revealElements = document.querySelectorAll('.reveal, .reveal-delay');
 
-    const revealObserver = new IntersectionObserver((entries, observer) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('active');
-                // Optional: Stop observing once revealed
-                // observer.unobserve(entry.target);
-            }
+    if ('IntersectionObserver' in window && !reduceMotion) {
+        const revealObserver = new IntersectionObserver((entries, observer) => {
+            let order = 0;
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) return;
+                const el = entry.target;
+                setTimeout(() => el.classList.add('active'), order * 90);
+                order++;
+                observer.unobserve(el);
+            });
+        }, {
+            threshold: 0.12,
+            rootMargin: '0px 0px -40px 0px'
         });
-    }, {
-        root: null,
-        threshold: 0.15, // Trigger when 15% visible
-        rootMargin: "0px 0px -50px 0px"
-    });
 
-    revealElements.forEach(el => {
-        revealObserver.observe(el);
-    });
+        revealElements.forEach(el => revealObserver.observe(el));
+    } else {
+        revealElements.forEach(el => el.classList.add('active'));
+    }
 
-
-    // 4. Mobile Menu Toggle
+    // 5. Mobile menu
     const mobileMenuBtn = document.getElementById('mobile-menu-btn');
     const navLinksContainer = document.querySelector('.nav-links');
 
+    function setMenuOpen(isOpen) {
+        mobileMenuBtn.classList.toggle('active', isOpen);
+        navLinksContainer.classList.toggle('active', isOpen);
+        document.body.classList.toggle('menu-open', isOpen);
+        mobileMenuBtn.setAttribute('aria-expanded', String(isOpen));
+        mobileMenuBtn.setAttribute('aria-label', isOpen ? 'Close menu' : 'Open menu');
+    }
+
     if (mobileMenuBtn && navLinksContainer) {
         mobileMenuBtn.addEventListener('click', () => {
-            mobileMenuBtn.classList.toggle('active');
-            navLinksContainer.classList.toggle('active');
+            setMenuOpen(!navLinksContainer.classList.contains('active'));
+        });
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                if (!link.classList.contains('dropdown-toggle')) {
+                    setMenuOpen(false);
+                }
+            });
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') setMenuOpen(false);
+        });
+
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) setMenuOpen(false);
         });
     }
 
-    // Dropdown handling on mobile
-    const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
-    dropdownToggles.forEach(toggle => {
-        toggle.addEventListener('click', (e) => {
-            if (window.innerWidth <= 768) {
-                e.preventDefault();
-                const dropdown = toggle.parentElement;
-                dropdown.classList.toggle('active');
-            }
-        });
+    // The "Privacy" label only opens its submenu, it is not a link
+    document.querySelectorAll('.dropdown-toggle').forEach(toggle => {
+        toggle.addEventListener('click', (e) => e.preventDefault());
     });
-
-    // Close mobile menu when a link is clicked
-    navLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            if (navLinksContainer.classList.contains('active')) {
-                mobileMenuBtn.classList.remove('active');
-                navLinksContainer.classList.remove('active');
-            }
-        });
-    });
-
-
-    // 5. 3D Tilt Effect for Project Cards
-    const tiltCards = document.querySelectorAll('.tilt-card');
-
-    tiltCards.forEach(card => {
-        card.addEventListener('mousemove', (e) => {
-            // Only apply on desktop
-            if (window.innerWidth > 768) {
-                const rect = card.getBoundingClientRect();
-                const x = e.clientX - rect.left; // x position within the element
-                const y = e.clientY - rect.top;  // y position within the element
-
-                const centerX = rect.width / 2;
-                const centerY = rect.height / 2;
-
-                // Calculate rotation (max rotation is 10deg)
-                const rotateX = ((y - centerY) / centerY) * -10;
-                const rotateY = ((x - centerX) / centerX) * 10;
-
-                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
-                // Optional: adjust border/glow based on mouse position
-            }
-        });
-
-        card.addEventListener('mouseleave', () => {
-            card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)`;
-            card.style.transition = 'transform 0.5s ease';
-        });
-
-        card.addEventListener('mouseenter', () => {
-            card.style.transition = 'none'; // remove transition for smooth tracking
-        });
-    });
-
-    // 6. Mouse Glow Effect with Lerp
-    const cursorGlow = document.getElementById('cursor-glow');
-    if (cursorGlow) {
-        let mouseX = window.innerWidth / 2;
-        let mouseY = window.innerHeight / 2;
-        let glowX = mouseX;
-        let glowY = mouseY;
-        let isMouseMoving = false;
-
-        window.addEventListener('mousemove', (e) => {
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-            if (!isMouseMoving) {
-                isMouseMoving = true;
-                cursorGlow.style.opacity = '1';
-            }
-        });
-
-        document.addEventListener('mouseleave', () => {
-            isMouseMoving = false;
-            cursorGlow.style.opacity = '0';
-        });
-
-        function animateGlow() {
-            glowX += (mouseX - glowX) * 0.15;
-            glowY += (mouseY - glowY) * 0.15;
-            
-            // Center the 600x600 glow
-            cursorGlow.style.transform = `translate3d(${glowX - 300}px, ${glowY - 300}px, 0)`;
-
-            requestAnimationFrame(animateGlow);
-        }
-        
-        animateGlow();
-    }
-
 });
