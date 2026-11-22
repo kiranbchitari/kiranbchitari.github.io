@@ -734,6 +734,55 @@ body.light-mode .sun-icon {
     color: var(--text-secondary);
 }
 
+.lab-link {
+    display: block;
+    transition: transform 0.5s var(--ease-out), opacity 0.9s var(--ease-out), background-color 0.4s ease;
+}
+
+.lab-link.active:hover {
+    transform: scale(1.015);
+}
+
+.lab-featured {
+    grid-column: 1 / -1;
+    padding: 40px;
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+}
+
+.lab-featured::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    opacity: var(--aurora-opacity);
+    background:
+        radial-gradient(50% 120% at 100% 0%, rgba(48, 209, 88, 0.16), transparent 70%),
+        radial-gradient(45% 110% at 75% 100%, rgba(41, 151, 255, 0.18), transparent 70%);
+}
+
+.lab-featured h3 {
+    font-size: 30px;
+    letter-spacing: -0.025em;
+}
+
+.lab-featured p {
+    max-width: 560px;
+    font-size: 17px;
+}
+
+.lab-more {
+    display: inline-block;
+    margin-top: 14px;
+    font-size: 15px;
+    color: var(--accent);
+}
+
+.lab-link:hover .lab-more {
+    text-decoration: underline;
+}
+
 /* ===== Experience ===== */
 .timeline {
     border-top: 1px solid var(--hairline);
@@ -1240,7 +1289,8 @@ footer {
     }
 
     .project-card,
-    .project-featured {
+    .project-featured,
+    .lab-featured {
         padding: 32px 28px;
     }
 
